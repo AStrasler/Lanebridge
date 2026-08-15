@@ -3,17 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MindBridge</title>
+  <title>Lanebridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0f1115;
-      --surface: #1a1d24;
-      --border: #2a2f3a;
-      --text: #e8eaed;
-      --muted: #9aa0a6;
-      --accent: #7c9cff;
-      --user-bg: #2a3344;
-      --assistant-bg: #1e222b;
+      --bg: #1f1c18;
+      --surface: #2a2621;
+      --surface-raised: #332e27;
+      --border: #453f36;
+      --text: #ece7df;
+      --muted: #a89c8c;
+      --lane-olive: #7f8f6a;
+      --lane-silver: #c7c2b4;
+      --lanes: linear-gradient(90deg, var(--lane-olive), var(--lane-silver));
     }
 
     * {
@@ -23,7 +27,7 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
       height: 100vh;
@@ -31,77 +35,164 @@
       flex-direction: column;
     }
 
+    :focus-visible {
+      outline: 2px solid var(--lane-silver);
+      outline-offset: 2px;
+    }
+
     header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
+      position: relative;
+      padding: 18px 24px;
       background: var(--surface);
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
 
-    header h1 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      letter-spacing: 0.3px;
+    header::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 2px;
+      background: var(--lanes);
+      opacity: 0.85;
     }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .brand h1 {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-weight: 600;
+      font-size: 1.3rem;
+      letter-spacing: 0.2px;
+      color: var(--text);
+    }
+
+    .brand .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    #empty-state {
+      max-width: 560px;
+      margin: auto;
+      text-align: left;
+      padding: 0 20px;
+    }
+
+    #empty-state h2 {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 1.6rem;
+      line-height: 1.35;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    #empty-state p {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--muted);
+      max-width: 440px;
+    }
+
+    #empty-state .lane-mark {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 16px;
+    }
+
+    #empty-state .lane-mark span {
+      width: 22px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    #empty-state .lane-mark span:nth-child(1) { background: var(--lane-olive); }
+    #empty-state .lane-mark span:nth-child(2) { background: var(--lane-silver); }
 
     header button {
       background: transparent;
       border: 1px solid var(--border);
       color: var(--muted);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
       cursor: pointer;
+      transition: border-color 0.15s ease, color 0.15s ease;
     }
 
     header button:hover {
       color: var(--text);
-      border-color: var(--muted);
+      border-color: var(--lane-silver);
     }
 
     #chat {
       flex: 1;
       overflow-y: auto;
-      padding: 20px;
+      padding: 28px 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 20px;
+    }
+
+    #chat.is-empty {
+      justify-content: center;
     }
 
     .message {
-      max-width: 780px;
+      max-width: 720px;
       width: 100%;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 5px;
     }
 
     .message .role {
-      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 1.2px;
     }
 
     .message .bubble {
-      padding: 12px 16px;
-      border-radius: 12px;
-      line-height: 1.55;
+      padding: 13px 17px;
+      border-radius: 14px;
+      line-height: 1.6;
       white-space: pre-wrap;
       word-break: break-word;
+      font-size: 0.98rem;
     }
 
     .message.user .bubble {
-      background: var(--user-bg);
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
       align-self: flex-end;
     }
 
     .message.assistant .bubble {
-      background: var(--assistant-bg);
+      background: var(--surface);
       border: 1px solid var(--border);
+      border-left: 3px solid transparent;
+      border-image: var(--lanes) 1;
+      border-image-slice: 1;
+      border-width: 1px 1px 1px 3px;
     }
 
     .message.user {
@@ -115,11 +206,11 @@
     #input-area {
       border-top: 1px solid var(--border);
       background: var(--surface);
-      padding: 16px 20px;
+      padding: 18px 20px;
     }
 
     #input-form {
-      max-width: 780px;
+      max-width: 720px;
       margin: 0 auto;
       display: flex;
       gap: 10px;
@@ -130,29 +221,35 @@
       background: var(--bg);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 12px 16px;
+      padding: 13px 16px;
       border-radius: 10px;
       font-size: 1rem;
       resize: none;
       min-height: 48px;
       max-height: 140px;
       font-family: inherit;
+      transition: border-color 0.15s ease;
     }
 
     #message-input:focus {
       outline: none;
-      border-color: var(--accent);
+      border-color: var(--lane-silver);
     }
 
     #send-btn {
-      background: var(--accent);
-      color: #0f1115;
+      background: var(--lane-olive);
+      color: var(--bg);
       border: none;
-      padding: 0 20px;
+      padding: 0 22px;
       border-radius: 10px;
       font-weight: 600;
       cursor: pointer;
       font-size: 0.95rem;
+      transition: filter 0.15s ease;
+    }
+
+    #send-btn:hover:not(:disabled) {
+      filter: brightness(1.08);
     }
 
     #send-btn:disabled {
@@ -161,28 +258,79 @@
     }
 
     .typing {
-      color: var(--muted);
-      font-size: 0.9rem;
-      padding: 8px 0;
-      max-width: 780px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 720px;
       margin: 0 auto;
       width: 100%;
+      padding: 4px 0;
+    }
+
+    .typing .dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .typing .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      animation: pulse 1.1s ease-in-out infinite;
+    }
+
+    .typing .dot:nth-child(1) { background: var(--lane-olive); animation-delay: 0s; }
+    .typing .dot:nth-child(2) { background: var(--lane-silver); animation-delay: 0.22s; }
+
+    .typing .label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    @keyframes pulse {
+      0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+      30% { opacity: 1; transform: translateY(-3px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .typing .dot {
+        animation: none;
+        opacity: 0.8;
+      }
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 14px 16px; }
+      #chat { padding: 20px 14px; }
+      #input-area { padding: 14px 16px; }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>MindBridge</h1>
+    <div class="brand">
+      <h1>Lanebridge</h1>
+      <span class="tag">parallel by default</span>
+    </div>
     <button id="new-chat-btn">New Chat</button>
   </header>
 
-  <div id="chat"></div>
+  <div id="chat" class="is-empty">
+    <div id="empty-state">
+      <div class="lane-mark"><span></span><span></span></div>
+      <h2>Start wherever the thread starts.</h2>
+      <p>Jump topics, follow a condition, think out loud mid-sentence — Lanebridge stays with the lanes instead of forcing you into one at a time.</p>
+    </div>
+  </div>
 
   <div id="input-area">
     <form id="input-form">
       <textarea
         id="message-input"
-        placeholder="Type a message..."
+        placeholder="Say what's on your mind..."
         rows="1"
         autofocus
       ></textarea>
@@ -197,7 +345,7 @@
 
     const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/chat`;
 
-    let conversationId = localStorage.getItem("mindbridge_conversation_id") || null;
+    let conversationId = localStorage.getItem("lanebridge_conversation_id") || null;
 
     const chatEl = document.getElementById("chat");
     const form = document.getElementById("input-form");
@@ -219,18 +367,31 @@
       }
     });
 
+    const emptyStateHTML = `
+      <div id="empty-state">
+        <div class="lane-mark"><span></span><span></span></div>
+        <h2>Start wherever the thread starts.</h2>
+        <p>Jump topics, follow a condition, think out loud mid-sentence — Lanebridge stays with the lanes instead of forcing you into one at a time.</p>
+      </div>
+    `;
+
     newChatBtn.addEventListener("click", () => {
       conversationId = null;
-      localStorage.removeItem("mindbridge_conversation_id");
-      chatEl.innerHTML = "";
+      localStorage.removeItem("lanebridge_conversation_id");
+      chatEl.classList.add("is-empty");
+      chatEl.innerHTML = emptyStateHTML;
       input.focus();
     });
 
     function addMessage(role, content) {
+      if (chatEl.classList.contains("is-empty")) {
+        chatEl.classList.remove("is-empty");
+        chatEl.innerHTML = "";
+      }
       const div = document.createElement("div");
       div.className = `message ${role}`;
       div.innerHTML = `
-        <div class="role">${role === "user" ? "You" : "MindBridge"}</div>
+        <div class="role">${role === "user" ? "You" : "Lanebridge"}</div>
         <div class="bubble">${escapeHtml(content)}</div>
       `;
       chatEl.appendChild(div);
@@ -247,7 +408,13 @@
       const el = document.createElement("div");
       el.className = "typing";
       el.id = "typing-indicator";
-      el.textContent = "MindBridge is thinking...";
+      el.innerHTML = `
+        <span class="dots">
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </span>
+        <span class="label">Processing lanes</span>
+      `;
       chatEl.appendChild(el);
       chatEl.scrollTop = chatEl.scrollHeight;
     }
@@ -292,7 +459,7 @@
         } else {
           addMessage("assistant", data.reply);
           conversationId = data.conversation_id;
-          localStorage.setItem("mindbridge_conversation_id", conversationId);
+          localStorage.setItem("lanebridge_conversation_id", conversationId);
         }
       } catch (err) {
         hideTyping();
