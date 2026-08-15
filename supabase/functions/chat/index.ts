@@ -77,20 +77,24 @@ serve(async (req) => {
 
     if (userMsgError) throw userMsgError;
 
-    // Load conversation history (last 20 messages)
+    // Load the most recent 20 messages, then put them back in chronological order.
+    // (Previously this used ascending: true, which locked onto the OLDEST 20
+    // messages forever once a conversation grew past that point.)
     const { data: history, error: historyError } = await supabase
       .from("messages")
       .select("role, content")
       .eq("conversation_id", convId)
-      .order("created_at", { ascending: true })
+      .order("created_at", { ascending: false })
       .limit(20);
 
     if (historyError) throw historyError;
 
+    const chronologicalHistory = (history || []).slice().reverse();
+
     // Build messages for Groq
     const messagesForGroq = [
       { role: "system", content: THOUGHT_ENGINE },
-      ...(history || []).map((m) => ({
+      ...chronologicalHistory.map((m) => ({
         role: m.role,
         content: m.content,
       })),
@@ -148,8 +152,11 @@ serve(async (req) => {
     );
   } catch (err) {
     console.error(err);
+    // Don't assume err is an Error instance — Groq/Supabase can throw
+    // strings or plain objects, which would otherwise surface as "undefined".
+    const message = err instanceof Error ? err.message : String(err);
     return new Response(
-      JSON.stringify({ error: err.message || "Internal server error" }),
+      JSON.stringify({ error: message || "Internal server error" }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
